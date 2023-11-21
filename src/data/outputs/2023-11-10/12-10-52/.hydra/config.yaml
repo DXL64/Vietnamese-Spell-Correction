@@ -1,0 +1,6 @@
+_target_: src.data.spellcorrect_datamodule.SpellCorrectDataModule
+data_dir: ${paths.data_dir}
+dataset: dxl
+batch_size: 1
+num_workers: 0
+pin_memory: false

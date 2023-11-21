@@ -8,7 +8,7 @@ setup(
     description="Describe Your Cool Project",
     author="",
     author_email="",
-    url="https://github.com/user/project",  # REPLACE WITH YOUR OWN GITHUB PROJECT LINK
+    url="https://github.com/DXL64/Vietnamese-Spell-Correction",  # REPLACE WITH YOUR OWN GITHUB PROJECT LINK
     install_requires=["pytorch-lightning", "hydra-core"],
     packages=find_packages(),
 )

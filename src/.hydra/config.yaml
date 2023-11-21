@@ -1,0 +1,86 @@
+task_name: train
+tags:
+- dev
+train: true
+test: true
+ckpt_path: null
+seed: null
+data:
+  _target_: src.data.spellcorrect_datamodule.SpellCorrectDataModule
+  data_dir: ${paths.data_dir}
+  dataset: dxl
+  batch_size: 1
+  num_workers: 0
+  pin_memory: false
+  bucket_sampling: true
+model:
+  _target_: src.models.spellcorrection_module.SpellCorrectionModule
+  optimizer:
+    _target_: transformers.optimization.AdamW
+    _partial_: true
+    lr: 0.0003
+    weight_decay: 0.01
+    correct_bias: false
+  scheduler:
+    _target_: transformers.optimization.get_linear_schedule_with_warmup
+    _partial_: true
+  model_wrapper:
+    _target_: src.models.components.model.ModelWrapper
+    model_name: tfmwtr
+    vocab_dataset: dxl
+  data_path: /work/hpc/iai/loc/Vietnamese-Spell-Correction/data/dxl
+  dataset_name: dxl
+  epoch: 5
+  warmup_percent: 0.05
+callbacks:
+  model_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: epoch_{epoch:03d}
+    monitor: val/acc
+    verbose: false
+    save_last: true
+    save_top_k: 1
+    mode: max
+    auto_insert_metric_name: false
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+  early_stopping:
+    _target_: pytorch_lightning.callbacks.EarlyStopping
+    monitor: val/acc
+    min_delta: 0.0
+    patience: 100
+    verbose: false
+    mode: max
+    strict: true
+    check_finite: true
+    stopping_threshold: null
+    divergence_threshold: null
+    check_on_train_epoch_end: null
+  model_summary:
+    _target_: pytorch_lightning.callbacks.RichModelSummary
+    max_depth: -1
+  rich_progress_bar:
+    _target_: pytorch_lightning.callbacks.RichProgressBar
+trainer:
+  _target_: pytorch_lightning.Trainer
+  default_root_dir: ${paths.output_dir}
+  min_epochs: 1
+  max_epochs: 10
+  accelerator: gpu
+  devices: 4
+  check_val_every_n_epoch: 1
+  deterministic: false
+paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  data_dir: ${paths.root_dir}/data/
+  log_dir: ${paths.root_dir}/logs/
+  output_dir: ${hydra:runtime.output_dir}
+  work_dir: ${hydra:runtime.cwd}
+extras:
+  ignore_warnings: false
+  enforce_tags: true
+  print_config: true

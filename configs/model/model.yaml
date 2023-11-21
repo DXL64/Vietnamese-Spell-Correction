@@ -1,0 +1,23 @@
+_target_: src.models.spellcorrection_module.SpellCorrectionModule
+
+optimizer:
+  _target_: transformers.optimization.AdamW
+  _partial_: true
+  lr: 0.0003
+  weight_decay: 0.01
+  correct_bias: False
+
+scheduler:
+  _target_: transformers.optimization.get_linear_schedule_with_warmup
+  _partial_: true
+
+model_wrapper:
+  _target_: src.models.components.model.ModelWrapper
+  model_name: tfmwtr
+  vocab_dataset: dxl
+  device: cuda
+
+dataset_name: dxl
+epoch: 5 
+warmup_percent: 0.05
+device: cuda
